@@ -17,8 +17,8 @@ export default function AddData() {
         },
         body: JSON.stringify({ text: addData }),
       });
-      setIsSuccess(true);
       setAddData("");
+      setIsSuccess(true);
     } catch (err) {
       console.log(err);
     }
