@@ -3,17 +3,26 @@ import Spacer from "./Spacer";
 
 export default function AddData() {
   const [addData, setAddData] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const saveToDB = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const res = await fetch("http://localhost:3002", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ text: addData }),
-    });
-    const data = await res.json();
+    try {
+      setIsSaving(true);
+      await fetch(process.env.NEXT_PUBLIC_SERVER_URL || "", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text: addData }),
+      });
+      setAddData("");
+      setIsSuccess(true);
+    } catch (err) {
+      console.log(err);
+    }
+    setIsSaving(false);
   };
 
   return (
@@ -29,7 +38,11 @@ export default function AddData() {
         value={addData}
       />
       <Spacer size={16} axis="y" />
-      <button className="bg-black rounded-6px text-white py-8px">save</button>
+      <button className="bg-black rounded-6px text-white py-8px">
+        {isSaving ? "saving..." : "save"}{" "}
+      </button>
+      <Spacer size={16} axis="y" />
+      {isSuccess ? <p>Data added successfully</p> : null}
     </form>
   );
 }

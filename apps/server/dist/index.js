@@ -49,6 +49,7 @@ app.use((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
 app.post("/", (req, res) => {
     const tokenized = getChunksOfText(req.body.text);
     saveEmbeddings(tokenized);
+    res.sendStatus(200);
 });
 app.get("/search", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (typeof req.query.search === "string") {
@@ -69,8 +70,8 @@ app.get("/search", (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.json({ data: "" });
     }
 }));
-app.listen(process.env.PORT || 3002, () => {
-    console.log(`[server]: Server is running at http://localhost:${3002}`);
+app.listen(process.env.PORT || 3006, () => {
+    console.log(`[server]: Server is running at http://localhost:${3006}`);
 });
 const getChunksOfText = (inputText) => {
     const MAX_TOKEN = 200;
@@ -106,7 +107,6 @@ const saveEmbeddings = (chunks) => { var _a, chunks_1, chunks_1_1; return __awai
                     embedding,
                     content: chunk,
                 });
-                console.log(data.error);
             }
             catch (err) {
                 console.log(err);
@@ -155,7 +155,7 @@ const getAnswer = (query, contextText) => __awaiter(void 0, void 0, void 0, func
   Answer as plain text
 `;
     const completionResponse = yield openai.completions.create({
-        model: "text-babbage-001",
+        model: "gpt-3.5-turbo-instruct",
         prompt,
         max_tokens: 300,
         temperature: 0, // Set to 0 for deterministic results

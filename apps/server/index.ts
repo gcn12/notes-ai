@@ -33,6 +33,7 @@ app.use(async (req, res, next) => {
 app.post("/", (req, res) => {
   const tokenized = getChunksOfText(req.body.text);
   saveEmbeddings(tokenized);
+  res.sendStatus(200);
 });
 
 app.get("/search", async (req, res) => {
@@ -53,8 +54,8 @@ app.get("/search", async (req, res) => {
   }
 });
 
-app.listen(process.env.PORT || 3002, () => {
-  console.log(`[server]: Server is running at http://localhost:${3002}`);
+app.listen(process.env.PORT || 3006, () => {
+  console.log(`[server]: Server is running at http://localhost:${3006}`);
 });
 
 const getChunksOfText = (inputText: string) => {
@@ -92,7 +93,6 @@ const saveEmbeddings = async (chunks: string[]) => {
         embedding,
         content: chunk,
       });
-      console.log(data.error);
     } catch (err) {
       console.log(err);
     }
@@ -138,7 +138,7 @@ const getAnswer = async (query: string, contextText: string) => {
 `;
 
   const completionResponse = await openai.completions.create({
-    model: "text-babbage-001",
+    model: "gpt-3.5-turbo-instruct",
     prompt,
     max_tokens: 300,
     temperature: 0, // Set to 0 for deterministic results

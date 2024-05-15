@@ -15,7 +15,6 @@ export const checkRateLimit = async () => {
   const limitRes = await redis.get("limit");
   if (limitRes) {
     const { tokens, time } = JSON.parse(limitRes);
-    console.log(tokens);
     if (tokens === 0) {
       if (Math.floor(Date.now() / 1000) - time > 20) {
         redis.set(

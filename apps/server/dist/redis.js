@@ -28,7 +28,6 @@ const checkRateLimit = () => __awaiter(void 0, void 0, void 0, function* () {
     const limitRes = yield exports.redis.get("limit");
     if (limitRes) {
         const { tokens, time } = JSON.parse(limitRes);
-        console.log(tokens);
         if (tokens === 0) {
             if (Math.floor(Date.now() / 1000) - time > 20) {
                 exports.redis.set("limit", JSON.stringify({ time: getUnixSeconds(), tokens: 3 }));

@@ -11,12 +11,15 @@ export default function Search() {
   const getSearch = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSearching(true);
-    const res = await fetch(`http://localhost:3002/search?search=${search}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/search?search=${search}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     const data = await res.json();
     setAnswer(data.data);
