@@ -11,25 +11,23 @@ const getUnixSeconds = () => {
   return Math.floor(Date.now() / 1000);
 };
 
-export const checkRateLimit = async () => {
-  const limitRes = await redis.get("limit");
-  if (limitRes) {
-    const { tokens, time } = JSON.parse(limitRes);
-    if (tokens === 0) {
-      if (Math.floor(Date.now() / 1000) - time > 20) {
-        redis.set(
-          "limit",
-          JSON.stringify({ time: getUnixSeconds(), tokens: 3 })
-        );
-      } else {
-        return true;
-      }
-    } else {
-      redis.set("limit", JSON.stringify({ time, tokens: tokens - 1 }));
-      return false;
-    }
-  } else {
+export const isRateLimit = async () => {
+  const limitObj = await redis.get("limit");
+
+  if (!limitObj) {
     redis.set("limit", JSON.stringify({ time: getUnixSeconds(), tokens: 3 }));
     return false;
   }
+
+  const { tokens, time } = JSON.parse(limitObj);
+  if (tokens === 0) {
+    if (Math.floor(Date.now() / 1000) - time > 20) {
+      redis.set("limit", JSON.stringify({ time: getUnixSeconds(), tokens: 3 }));
+      return false;
+    }
+    return true;
+  }
+
+  redis.set("limit", JSON.stringify({ time, tokens: tokens - 1 }));
+  return false;
 };

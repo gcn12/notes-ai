@@ -4,7 +4,7 @@ const GPT3Tokenizer = require("gpt3-tokenizer");
 import cors from "cors";
 import OpenAI from "openai";
 import { createClient } from "@supabase/supabase-js";
-import { checkRateLimit } from "./redis";
+import { isRateLimit } from "./redis";
 
 dotenv.config();
 const app = express();
@@ -21,8 +21,8 @@ const openai = new OpenAI({
 
 app.use(cors());
 app.use(express.json());
-app.use(async (req, res, next) => {
-  const isLimit = await checkRateLimit();
+app.use(async (_req, res, next) => {
+  const isLimit = await isRateLimit();
   if (isLimit) {
     res.status(409).send("rate limit exceeded");
   } else {

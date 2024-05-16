@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkRateLimit = exports.redis = void 0;
+exports.isRateLimit = exports.redis = void 0;
 const ioredis_1 = require("ioredis");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
@@ -24,26 +24,21 @@ exports.redis = new ioredis_1.Redis({
 const getUnixSeconds = () => {
     return Math.floor(Date.now() / 1000);
 };
-const checkRateLimit = () => __awaiter(void 0, void 0, void 0, function* () {
-    const limitRes = yield exports.redis.get("limit");
-    if (limitRes) {
-        const { tokens, time } = JSON.parse(limitRes);
-        if (tokens === 0) {
-            if (Math.floor(Date.now() / 1000) - time > 20) {
-                exports.redis.set("limit", JSON.stringify({ time: getUnixSeconds(), tokens: 3 }));
-            }
-            else {
-                return true;
-            }
-        }
-        else {
-            exports.redis.set("limit", JSON.stringify({ time, tokens: tokens - 1 }));
-            return false;
-        }
-    }
-    else {
+const isRateLimit = () => __awaiter(void 0, void 0, void 0, function* () {
+    const limitObj = yield exports.redis.get("limit");
+    if (!limitObj) {
         exports.redis.set("limit", JSON.stringify({ time: getUnixSeconds(), tokens: 3 }));
         return false;
     }
+    const { tokens, time } = JSON.parse(limitObj);
+    if (tokens === 0) {
+        if (Math.floor(Date.now() / 1000) - time > 20) {
+            exports.redis.set("limit", JSON.stringify({ time: getUnixSeconds(), tokens: 3 }));
+            return false;
+        }
+        return true;
+    }
+    exports.redis.set("limit", JSON.stringify({ time, tokens: tokens - 1 }));
+    return false;
 });
-exports.checkRateLimit = checkRateLimit;
+exports.isRateLimit = isRateLimit;

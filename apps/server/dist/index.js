@@ -37,8 +37,8 @@ const openai = new openai_1.default({
 });
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
-app.use((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const isLimit = yield (0, redis_1.checkRateLimit)();
+app.use((_req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const isLimit = yield (0, redis_1.isRateLimit)();
     if (isLimit) {
         res.status(409).send("rate limit exceeded");
     }
